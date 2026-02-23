@@ -12,10 +12,14 @@ import java.util.Map;
 import uniandes.dpoo.aerolinea.exceptions.InformacionInconsistenteException;
 import uniandes.dpoo.aerolinea.exceptions.VueloSobrevendidoException;
 import uniandes.dpoo.aerolinea.modelo.cliente.Cliente;
+import uniandes.dpoo.aerolinea.modelo.tarifas.CalculadoraTarifas;
+import uniandes.dpoo.aerolinea.modelo.tarifas.CalculadoraTarifasTemporadaAlta;
+import uniandes.dpoo.aerolinea.modelo.tarifas.CalculadoraTarifasTemporadaBaja;
 import uniandes.dpoo.aerolinea.persistencia.CentralPersistencia;
 import uniandes.dpoo.aerolinea.persistencia.IPersistenciaAerolinea;
 import uniandes.dpoo.aerolinea.persistencia.IPersistenciaTiquetes;
 import uniandes.dpoo.aerolinea.persistencia.TipoInvalidoException;
+import uniandes.dpoo.aerolinea.tiquetes.GeneradorTiquetes;
 import uniandes.dpoo.aerolinea.tiquetes.Tiquete;
 
 /**
@@ -77,7 +81,7 @@ public class Aerolinea
      */
     public void agregarRuta( Ruta ruta )
     {
-        this.rutas.put( ruta.getCodigoRuta( ), ruta );
+        this.rutas.put( ruta.getCodigoRuta(), ruta );
     }
 
     /**
@@ -163,7 +167,11 @@ public class Aerolinea
      */
     public Vuelo getVuelo( String codigoRuta, String fechaVuelo )
     {
-        // TODO implementar
+    	for (Vuelo vuelo : vuelos) {
+            if (vuelo.getRuta().getCodigoRuta().equals(codigoRuta) && vuelo.getFecha().equals(fechaVuelo)) {
+                return vuelo;
+            }
+        }
         return null;
     }
 
@@ -173,17 +181,20 @@ public class Aerolinea
      */
     public Collection<Cliente> getClientes( )
     {
-        return clientes.values( );
+        return clientes.values();
     }
 
     /**
      * Retorna todos los tiquetes de la aerolínea, los cuales se recolectan vuelo por vuelo
      * @return
      */
-    public Collection<Tiquete> getTiquetes( )
+    public Collection<Tiquete> getTiquetes()
     {
-        // TODO implementar
-        return null;
+    	List<Tiquete> todosLosTiquetes = new ArrayList<>();
+        for (Vuelo vuelo : vuelos) {
+            todosLosTiquetes.addAll(vuelo.getTiquetes());
+        }
+        return todosLosTiquetes;
 
     }
 
@@ -285,8 +296,37 @@ public class Aerolinea
      */
     public int venderTiquetes( String identificadorCliente, String fecha, String codigoRuta, int cantidad ) throws VueloSobrevendidoException, Exception
     {
-        // TODO Implementar el método
-        return -1;
+    	Vuelo vuelo = getVuelo(codigoRuta, fecha);
+        Cliente cliente = getCliente(identificadorCliente);
+
+        if (vuelo == null) throw new Exception("El vuelo no existe.");
+        if (cliente == null) throw new Exception("El cliente no existe.");
+        
+        // Verificar disponibilidad en el avión
+        if (vuelo.getTiquetes().size() + cantidad > vuelo.getAvion().getCapacidad()) {
+            throw new VueloSobrevendidoException(vuelo);
+        }
+
+        // Determinar temporada y calculadora
+        CalculadoraTarifas calculadora;
+        if (esTemporadaAlta(fecha)) {
+            calculadora = new CalculadoraTarifasTemporadaAlta();
+        } else {
+            calculadora = new CalculadoraTarifasTemporadaBaja();
+        }
+
+        // Calcular tarifa individual y total
+        int tarifaIndividual = calculadora.calcularTarifa(vuelo, cliente);
+        int total = 0;
+
+        for (int i = 0; i < cantidad; i++) {
+            Tiquete t = GeneradorTiquetes.generarTiquete(vuelo, cliente, tarifaIndividual);
+            vuelo.agregarTiquete(t);
+            cliente.agregarTiquete(t);
+            total += tarifaIndividual;
+        }
+
+        return total;
     }
 
     /**
@@ -306,8 +346,28 @@ public class Aerolinea
      */
     public String consultarSaldoPendienteCliente( String identificadorCliente )
     {
-        // TODO Implementar el método
-        return "";
+    	Cliente cliente = getCliente(identificadorCliente);
+        if (cliente == null) {
+        	return "0";
+        }
+        return String.valueOf(cliente.calcularValorTotalTiquetes());
+    }
+    
+    private boolean esTemporadaAlta(String fecha) {
+    	String[] partes = fecha.split("-");
+        String mesTexto = partes[1];
+
+        int mes = Integer.parseInt(mesTexto);
+
+        if (mes == 1 || mes == 2 || mes == 3 || mes == 4 || mes == 5) {
+            return false;
+        }
+
+        if (mes == 9 || mes == 10 || mes == 11) {
+            return false;
+        }
+
+        return true;
     }
 
 }

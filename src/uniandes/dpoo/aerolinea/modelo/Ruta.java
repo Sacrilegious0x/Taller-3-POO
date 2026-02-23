@@ -6,9 +6,82 @@ package uniandes.dpoo.aerolinea.modelo;
 public class Ruta
 {
     // TODO completar
+	private String codigoRuta;
+	private String horaSalida;
+	private String horaLlegada;
+	private Aeropuerto origen;
+    private Aeropuerto destino;
+	
+    public Ruta(Aeropuerto origen, Aeropuerto destino, String horaSalida, String horaLlegada, String codigoRuta) {
+        this.origen = origen;
+        this.destino = destino;
+        this.horaSalida = horaSalida;
+        this.horaLlegada = horaLlegada;
+        this.codigoRuta = codigoRuta;
+    }
+    
+    
+    
+    
+	public Aeropuerto getOrigen() {
+		return origen;
+	}
 
 
-    /**
+
+
+	public Aeropuerto getDestino() {
+		return destino;
+	}
+
+
+
+
+	public void setOrigen(Aeropuerto origen) {
+		this.origen = origen;
+	}
+
+
+
+
+	public void setDestino(Aeropuerto destino) {
+		this.destino = destino;
+	}
+
+
+
+
+	public String getCodigoRuta() {
+		return codigoRuta;
+	}
+
+
+	public String getHoraSalida() {
+		return horaSalida;
+	}
+
+
+	public String getHoraLlegada() {
+		return horaLlegada;
+	}
+
+
+	public void setCodigoRuta(String codigoRuta) {
+		this.codigoRuta = codigoRuta;
+	}
+
+
+	public void setHoraSalida(String horaSalida) {
+		this.horaSalida = horaSalida;
+	}
+
+
+	public void setHoraLlegada(String horaLlegada) {
+		this.horaLlegada = horaLlegada;
+	}
+
+
+	/**
      * Dada una cadena con una hora y minutos, retorna los minutos.
      * 
      * Por ejemplo, para la cadena '715' retorna 15.
@@ -32,6 +105,10 @@ public class Ruta
     {
         int horas = Integer.parseInt( horaCompleta ) / 100;
         return horas;
+    }
+    
+    public int getDistancia() {
+        return Aeropuerto.calcularDistancia(origen, destino);
     }
 
     

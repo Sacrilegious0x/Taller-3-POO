@@ -2,16 +2,56 @@ package uniandes.dpoo.aerolinea.modelo.cliente;
 
 import org.json.JSONObject;
 
+import uniandes.dpoo.aerolinea.modelo.Vuelo;
+import uniandes.dpoo.aerolinea.tiquetes.Tiquete;
+
 /**
  * Esta clase se usa para representar a los clientes de la aerolínea que son empresas
  */
 public class ClienteCorporativo extends Cliente
 {
     // TODO completar
+    public static final String CORPORATIVO = "Corporativo";
+    public static final int GRANDE = 1;
+    public static final int MEDIANA = 2;
+    public static final int PEQUENA = 3;
+    private String nombreEmpresa;
+    private int tamanoEmpresa;
     
 
+    public ClienteCorporativo(String nombreEmpresa, int tamanoEmpresa) {
+		super(nombreEmpresa);
+		this.nombreEmpresa = nombreEmpresa;
+		this.tamanoEmpresa = tamanoEmpresa;
+	}
+    
+    
 
-    /**
+	public String getNombreEmpresa() {
+		return nombreEmpresa;
+	}
+
+
+
+	public int getTamanoEmpresa() {
+		return tamanoEmpresa;
+	}
+
+
+
+	public void setNombreEmpresa(String nombreEmpresa) {
+		this.nombreEmpresa = nombreEmpresa;
+	}
+
+
+
+	public void setTamanoEmpresa(int tamanoEmpresa) {
+		this.tamanoEmpresa = tamanoEmpresa;
+	}
+
+
+
+	/**
      * Crea un nuevo objeto de tipo a partir de un objeto JSON.
      * 
      * El objeto JSON debe tener dos atributos: nombreEmpresa (una cadena) y tamanoEmpresa (un número).
@@ -37,4 +77,34 @@ public class ClienteCorporativo extends Cliente
         jobject.put( "tipo", CORPORATIVO );
         return jobject;
     }
+
+	@Override
+	public String getTipoCliente() {
+		// TODO Auto-generated method stub
+		return CORPORATIVO;
+	}
+
+	@Override
+	public String getIdentificador() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void agregarTiquete(Tiquete tiquete) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int calcularValorTotalTiquetes() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void usarTiquete(Vuelo vuelo) {
+		// TODO Auto-generated method stub
+		
+	}
 }
